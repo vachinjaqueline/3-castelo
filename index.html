@@ -60,3 +60,41 @@ col1, col2, col3 = st.columns(3)
 with col1:
     total_prod = df["Produção (Toneladas)"].sum()
     st.metric(label="Produção Total Anual", value=f"{total_prod:,.1f} Ton")
+
+with col2:
+    media_agua = df["Consumo de Água (Liters/kg produzido)"].mean()
+    st.metric(label="Eficiência Hídrica Média", value=f"{media_agua:.1f} L/kg", delta=f"{-10 if tecnologia != 'Tradicional' else 5}%", delta_color="inverse")
+
+with col3:
+    total_carbono = df["Créditos de Carbono Gerados (Saldos)"].sum()
+    st.metric(label="Balanço de Carbono (CO2e)", value=f"{total_carbono:+,.1f} t", delta="Sequestro de Carbono" if total_carbono > 0 else "Emissão")
+
+st.divider()
+
+# --- GRÁFICOS INTERATIVOS ---
+col_graf1, col_graf2 = st.columns(2)
+
+with col_graf1:
+    st.write("### 📈 Evolução da Produção vs. Sustentabilidade")
+    fig_prod = px.line(df, x="Mês", y="Produção (Toneladas)", 
+                       title="Produção Agrícola Mensal",
+                       markers=True, color_discrete_sequence=["#2E7D32"])
+    st.plotly_chart(fig_prod, use_container_width=True)
+
+with col_graf2:
+    st.write("### 🍃 Balanço de Carbono Mensal")
+    # Define cor dinâmica se for positivo (verde) ou negativo (vermelho)
+    df['Status Carbono'] = df['Créditos de Carbono Gerados (Saldos)'].apply(lambda x: 'Sequestro' if x >= 0 else 'Emissão')
+    fig_carb = px.bar(df, x="Mês", y="Créditos de Carbono Gerados (Saldos)", 
+                      color='Status Carbono',
+                      title="Créditos de Carbono Gerados / Retidos",
+                      color_discrete_map={'Sequestro': '#4CAF50', 'Emissão': '#E53935'})
+    st.plotly_chart(fig_carb, use_container_width=True)
+
+# --- SEÇÃO INFORMATIVA ---
+st.subheader("💡 Pilares do Agro Sustentável Demonstrados")
+st.markdown("""
+* **Eficiência Hídrica:** Tecnologias como gotejamento e sensores de umidade de solo reduzem drasticamente o desperdício de água.
+* **ILPF (Integração Lavoura-Pecuária-Floresta):** Aumenta a biodiversidade do solo e ajuda a neutralizar as emissões de gases estufa da propriedade.
+* **Decisão Baseada em Dados:** Monitorar índices de produtividade em paralelo com índices ecológicos prova que a sustentabilidade impulsiona a lucratividade do produtor rural.
+""")
