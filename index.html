@@ -1,100 +1,180 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Forte, Futuro Sustentável</title>
+    <style>
+        /* Configurações Reset e Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-# Configuração da página do Streamlit
-st.set_page_config(
-    page_title="Agro Forte, Futuro Sustentável",
-    page_icon="🌱",
-    layout="wide"
-)
+        body {
+            background-color: #f4f7f5;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
 
-# Título Principal e Contexto
-st.title("🌱 Agro Forte, Futuro Sustentável")
-st.subheader("O Equilíbrio entre a Produção de Alimentos e a Conservação Ambiental")
-st.markdown("""
-Este painel interativo demonstra como métricas de tecnologia e manejo sustentável 
-podem otimizar a produção agrícola mantendo a pegada ecológica sob controle.
-""")
+        /* Cabeçalho / Hero Section */
+        header {
+            background: linear-gradient(rgba(46, 125, 50, 0.85), rgba(27, 94, 32, 0.9)), 
+                        url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            color: #ffffff;
+            padding: 100px 20px;
+            text-align: center;
+        }
 
-st.divider()
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-# --- SIDEBAR: Filtros de Simulação ---
-st.sidebar.header("Configurações da Fazenda")
-tamanho_fazenda = st.sidebar.slider("Área Cultivada (Hectares)", 100, 5000, 1200)
-tecnologia = st.sidebar.selectbox(
-    "Nível de Tecnologia de Manejo",
-    ["Tradicional", "Integrada (ILPF)", "Agricultura de Precisão / Regenerativa"]
-)
+        header p {
+            font-size: 1.4rem;
+            font-weight: 300;
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-# --- LÓGICA DE DADOS (Simulação baseada nos filtros) ---
-np.random.seed(42)
-meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+        /* Container Principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
 
-# Ajuste de multiplicadores baseado na tecnologia escolhida
-if tecnologia == "Tradicional":
-    mult_prod = 1.0
-    mult_agua = 1.3
-    mult_carbono = -0.2
-elif tecnologia == "Integrada (ILPF)":
-    mult_prod = 1.2
-    mult_agua = 0.9
-    mult_carbono = 0.5
-else:  # Regenerativa
-    mult_prod = 1.35
-    mult_agua = 0.7
-    mult_carbono = 1.2
+        /* Seção de Introdução */
+        .intro {
+            text-align: center;
+            margin-bottom: 60px;
+        }
 
-# Gerando dados fictícios plausíveis
-dados = {
-    "Mês": meses,
-    "Produção (Toneladas)": np.round(np.random.normal(50, 5, 12) * (tamanho_fazenda / 100) * mult_prod, 1),
-    "Consumo de Água (Liters/kg produzido)": np.round(np.random.normal(250, 15, 12) * mult_agua, 1),
-    "Créditos de Carbono Gerados (Saldos)": np.round(np.random.normal(10, 2, 12) * (tamanho_fazenda / 100) * mult_carbono, 1)
-}
-df = pd.DataFrame(dados)
+        .intro h2 {
+            color: #2e7d32;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
 
-# --- METRICAS PRINCIPAIS ---
-col1, col2, col3 = st.columns(3)
-with col1:
-    total_prod = df["Produção (Toneladas)"].sum()
-    st.metric(label="Produção Total Anual", value=f"{total_prod:,.1f} Ton")
+        .intro p {
+            font-size: 1.1rem;
+            color: #555;
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
-with col2:
-    media_agua = df["Consumo de Água (Liters/kg produzido)"].mean()
-    st.metric(label="Eficiência Hídrica Média", value=f"{media_agua:.1f} L/kg", delta=f"{-10 if tecnologia != 'Tradicional' else 5}%", delta_color="inverse")
+        /* Grid de Pilares (Cards) */
+        .grid-pilares {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
 
-with col3:
-    total_carbono = df["Créditos de Carbono Gerados (Saldos)"].sum()
-    st.metric(label="Balanço de Carbono (CO2e)", value=f"{total_carbono:+,.1f} t", delta="Sequestro de Carbono" if total_carbono > 0 else "Emissão")
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid #2e7d32;
+            transition: transform 0.3s ease;
+        }
 
-st.divider()
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-# --- GRÁFICOS INTERATIVOS ---
-col_graf1, col_graf2 = st.columns(2)
+        .card h3 {
+            color: #1b5e20;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
 
-with col_graf1:
-    st.write("### 📈 Evolução da Produção vs. Sustentabilidade")
-    fig_prod = px.line(df, x="Mês", y="Produção (Toneladas)", 
-                       title="Produção Agrícola Mensal",
-                       markers=True, color_discrete_sequence=["#2E7D32"])
-    st.plotly_chart(fig_prod, use_container_width=True)
+        .card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
 
-with col_graf2:
-    st.write("### 🍃 Balanço de Carbono Mensal")
-    # Define cor dinâmica se for positivo (verde) ou negativo (vermelho)
-    df['Status Carbono'] = df['Créditos de Carbono Gerados (Saldos)'].apply(lambda x: 'Sequestro' if x >= 0 else 'Emissão')
-    fig_carb = px.bar(df, x="Mês", y="Créditos de Carbono Gerados (Saldos)", 
-                      color='Status Carbono',
-                      title="Créditos de Carbono Gerados / Retidos",
-                      color_discrete_map={'Sequestro': '#4CAF50', 'Emissão': '#E53935'})
-    st.plotly_chart(fig_carb, use_container_width=True)
+        /* Seção de Destaque / Call to Action */
+        .destaque {
+            background-color: #e8f5e9;
+            border-left: 6px solid #2e7d32;
+            padding: 30px;
+            border-radius: 4px;
+            margin-bottom: 60px;
+        }
 
-# --- SEÇÃO INFORMATIVA ---
-st.subheader("💡 Pilares do Agro Sustentável Demonstrados")
-st.markdown("""
-* **Eficiência Hídrica:** Tecnologias como gotejamento e sensores de umidade de solo reduzem drasticamente o desperdício de água.
-* **ILPF (Integração Lavoura-Pecuária-Floresta):** Aumenta a biodiversidade do solo e ajuda a neutralizar as emissões de gases estufa da propriedade.
-* **Decisão Baseada em Dados:** Monitorar índices de produtividade em paralelo com índices ecológicos prova que a sustentabilidade impulsiona a lucratividade do produtor rural.
-""")
+        .destaque h3 {
+            color: #1b5e20;
+            margin-bottom: 10px;
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: #1b5e20;
+            color: #ffffff;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            header h1 { font-size: 2rem; }
+            header p { font-size: 1.1rem; }
+            .intro h2 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Agro Forte, Futuro Sustentável</h1>
+        <p>O equilíbrio inteligente entre a alta produtividade no campo e a preservação dos recursos naturais.</p>
+    </header>
+
+    <div class="container">
+        
+        <section class="intro">
+            <h2>Produzir com Responsabilidade</h2>
+            <p>O grande desafio do século XXI é alimentar uma população global em crescimento constante sem esgotar o planeta. O Agro Forte demonstra que a tecnologia, a ciência do solo e as práticas regenerativas são as maiores aliadas da conservação ambiental.</p>
+        </section>
+
+        <section class="grid-pilares">
+            
+            <div class="card">
+                <h3>Tecnologia e Precisão</h3>
+                <p>O uso de drones, sensores e inteligência artificial permite aplicar água, fertilizantes e defensivos na quantidade exata necessária. Isso reduz o desperdício, economiza recursos hídricos e protege os lençóis freáticos.</p>
+            </div>
+
+            <div class="card">
+                <h3>Sistemas Integrados (ILPF)</h3>
+                <p>A Integração Lavoura-Pecuária-Floresta (ILPF) otimiza o uso da terra ao combinar diferentes atividades na mesma área. Essa prática recupera solos degradados, aumenta a biodiversidade e neutraliza emissões de gases estufa.</p>
+            </div>
+
+            <div class="card">
+                <h3>Conservação Ativa</h3>
+                <p>Produtores conscientes atuam como guardiões das florestas nativas e das fontes de água dentro de suas propriedades. Preservar Áreas de Preservação Permanente (APPs) garante polinizadores naturais e o controle biológico de pragas.</p>
+            </div>
+
+        </section>
+
+        <section class="destaque">
+            <h3>🌱 O Futuro é Verde e Produtivo</h3>
+            <p>A sustentabilidade não é um obstáculo para o agronegócio; ela é a garantia de sua longevidade. Solos saudáveis e climas estáveis — promovidos pela própria preservação ambiental — são os ativos mais valiosos para que o campo continue forte, gerando riqueza, empregos e segurança alimentar para as próximas gerações.</p>
+        </section>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 - Agro Forte, Futuro Sustentável. Desenvolvido em prol da conscientização e do desenvolvimento do campo.</p>
+    </footer>
+
+</body>
+</html>
